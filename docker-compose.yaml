@@ -1,0 +1,44 @@
+services:
+  db:
+    container_name: bank-api
+    image: postgres:15.7
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=bank-api
+    logging:
+      options:
+        max-size: 10m
+        max-file: '3'
+    ports:
+      - 5432:5432
+    networks:
+      - app-network
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+
+  nest-bank-api-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    container_name: nest-bank-api-backend
+    env_file:
+      - .env
+    ports:
+      - 3000:3000
+    depends_on:
+      - db
+    networks:
+      - app-network
+    volumes:
+      - ./:/app
+    command: npm run start:dev
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  pg-data:
