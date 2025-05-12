@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsNumber, IsUUID, Min } from 'class-validator';
+import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 import { TransactionType } from '../entities/transaction.orm.entity';
 
 export class CreateTransactionDto {
@@ -12,16 +12,16 @@ export class CreateTransactionDto {
   type: TransactionType;
 
   @ApiProperty({ example: '123e4567-e89b-12d3-a456-426614174000', description: 'ID da conta de destino' })
-  @IsUUID()
+  @IsOptional()
+  @IsString()
   destination?: string;
 
-  @ApiProperty({ example: '123e4567-e89b-12d3-a456-426614174000', description: 'ID da conta de origin' })
-  @IsUUID()
+  @ApiProperty({ example: '123e4567-e89b-12d3-a456-426614174000', description: 'ID da conta de origem' })
+  @IsOptional()
+  @IsString()
   origin?: string;
 
   @ApiProperty({ example: 250, description: 'Valor da transação' })
   @IsNumber()
-  @Min(0.01)
   amount: number;
-
 }

@@ -22,6 +22,6 @@ export const databaseConfig: TypeOrmModuleAsyncOptions = {
     migrations: [path.join(__dirname, '/../migrations/*.{ts,js}')],
     synchronize: false,
     migrationsRun: true,
-    logging: true,
+    logging: false
   }),
 };

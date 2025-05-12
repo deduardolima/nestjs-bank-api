@@ -9,22 +9,14 @@ export class TransferUseCase {
   async execute(
     origin: string,
     destination: string,
-    amount: number,
-  ): Promise<{
-    originBalance: number;
-    destinationBalance: number;
-  } | null> {
+    amount: number
+  ): Promise<{ originBalance: number, destinationBalance: number } | null> {
     const originAccount = await this.accountRepository.findById(origin);
+    let destinationAccount = await this.accountRepository.findById(destination);
 
-    if (!originAccount) {
+    if (!originAccount || originAccount.balance < amount) {
       return null;
     }
-
-    if (originAccount.balance < amount) {
-      throw new Error('Saldo insuficiente');
-    }
-
-    let destinationAccount = await this.accountRepository.findById(destination);
 
     if (!destinationAccount) {
       destinationAccount = new Account(destination, 0);
@@ -37,8 +29,8 @@ export class TransferUseCase {
     await this.accountRepository.save(destinationAccount);
 
     return {
-      originBalance: originAccount.balance,
-      destinationBalance: destinationAccount.balance,
+      originBalance: parseFloat(originAccount.balance.toFixed(2)),
+      destinationBalance: parseFloat(destinationAccount.balance.toFixed(2)),
     };
   }
 }

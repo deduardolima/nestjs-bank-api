@@ -10,15 +10,11 @@ export class WithdrawUseCase {
   async execute(origin: string, amount: number): Promise<Account | null> {
     const account = await this.accountRepository.findById(origin);
 
-    if (!account) {
+    if (!account || account.balance < amount) {
       return null;
     }
 
-    if (account.balance < amount) {
-      throw new Error('Saldo insuficiente');
-    }
-
-    account.balance -= amount;
+    account.balance = parseFloat((account.balance - amount).toFixed(2));
     await this.accountRepository.save(account);
 
     return account;

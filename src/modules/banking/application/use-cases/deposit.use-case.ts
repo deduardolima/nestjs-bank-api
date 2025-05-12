@@ -7,17 +7,14 @@ import { AccountRepository } from '../../infra/repositories/account/account.repo
 export class DepositUseCase {
   constructor(private readonly accountRepository: AccountRepository) { }
 
-  async execute(destination: string, amount: number): Promise<{ id: string; balance: number }> {
+  async execute(destination: string, amount: number): Promise<Account> {
     let account = await this.accountRepository.findById(destination);
-
-    if (!account) {
-      account = new Account(destination, amount);
+    if (account) {
+      account.balance = parseFloat((account.balance + amount).toFixed(2));
     } else {
-      account.balance += amount;
+      account = new Account(destination, parseFloat(amount.toFixed(2)));
     }
-
     await this.accountRepository.save(account);
-
-    return { id: account.id, balance: account.balance };
+    return account;
   }
 }

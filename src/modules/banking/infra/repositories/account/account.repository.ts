@@ -15,9 +15,14 @@ export class AccountRepository implements IAccountRepository {
   /**
    * Busca uma conta pelo ID. Retorna null se não encontrar.
    */
-  async findById(accountId: string): Promise<Account | null> {
-    const account = await this.repo.findOne({ where: { id: accountId } });
-    return account ? new Account(account.id, account.balance) : null;
+  async findById(id: string): Promise<Account | null> {
+    const entity = await this.repo.findOne({ where: { id } });
+
+    if (!entity) {
+      return null;
+    }
+
+    return new Account(entity.id, Number(entity.balance));
   }
 
   /**
