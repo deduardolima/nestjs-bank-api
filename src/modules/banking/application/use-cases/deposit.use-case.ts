@@ -1,30 +1,23 @@
 import { Injectable } from '@nestjs/common';
 
-import { TransactionType } from '../../infra/entities/transaction.orm.entity';
+import { Account } from '../../domain/account.entity';
 import { AccountRepository } from '../../infra/repositories/account/account.repository';
-import { TransactionRepository } from '../../infra/repositories/transaction/transaction-repository';
 
 @Injectable()
 export class DepositUseCase {
-  constructor(
-    private readonly accountRepository: AccountRepository,
-    private readonly transactionRepository: TransactionRepository,
-  ) { }
+  constructor(private readonly accountRepository: AccountRepository) { }
 
-  async execute(accountId: string, amount: number): Promise<void> {
-    const account = await this.accountRepository.findById(accountId);
+  async execute(destination: string, amount: number): Promise<{ id: string; balance: number }> {
+    let account = await this.accountRepository.findById(destination);
 
     if (!account) {
-      throw new Error('Account not found');
+      account = new Account(destination, amount);
+    } else {
+      account.balance += amount;
     }
 
-    account.balance += amount;
     await this.accountRepository.save(account);
 
-    await this.transactionRepository.create({
-      accountId,
-      type: TransactionType.DEPOSIT,
-      amount,
-    });
+    return { id: account.id, balance: account.balance };
   }
 }

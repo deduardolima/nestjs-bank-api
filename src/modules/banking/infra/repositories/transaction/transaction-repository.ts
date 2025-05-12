@@ -1,8 +1,7 @@
-// modules/banking/infra/repositories/transaction.repository.ts
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Transaction } from 'src/modules/banking/domain/transaction.entity';
 import { Repository } from 'typeorm';
-import { Transaction } from '~/modules/banking/domain/transaction.entity';
 import { TransactionOrmEntity, TransactionType } from '../../entities/transaction.orm.entity';
 import { ITransactionRepository } from './transaction.repository.interface';
 

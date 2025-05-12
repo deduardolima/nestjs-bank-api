@@ -6,7 +6,7 @@ import { TransactionOrmEntity } from './infra/entities/transaction.orm.entity';
 import { AccountRepository } from './infra/repositories/account/account.repository';
 
 
-import { DepositUseCase, TransferUseCase, WithdrawUseCase } from './application/use-cases';
+import { DepositUseCase, ResetStateUseCase, TransferUseCase, WithdrawUseCase } from './application/use-cases';
 import { BankingController } from './infra/controllers/banking.controller';
 import { TransactionRepository } from './infra/repositories/transaction/transaction-repository';
 
@@ -22,6 +22,7 @@ import { TransactionRepository } from './infra/repositories/transaction/transact
     DepositUseCase,
     TransferUseCase,
     WithdrawUseCase,
+    ResetStateUseCase
 
   ],
 })

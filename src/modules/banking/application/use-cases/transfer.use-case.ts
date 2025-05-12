@@ -1,40 +1,44 @@
 import { Injectable } from '@nestjs/common';
-import { TransactionType } from '../../infra/entities/transaction.orm.entity';
+import { Account } from '../../domain/account.entity';
 import { AccountRepository } from '../../infra/repositories/account/account.repository';
-import { TransactionRepository } from '../../infra/repositories/transaction/transaction-repository';
 
 @Injectable()
 export class TransferUseCase {
-  constructor(
-    private readonly accountRepository: AccountRepository,
-    private readonly transactionRepository: TransactionRepository,
-  ) { }
+  constructor(private readonly accountRepository: AccountRepository) { }
 
-  async execute(fromAccountId: string, toAccountId: string, amount: number) {
-    if (fromAccountId === toAccountId) {
-      throw new Error('Cannot transfer to the same account');
-    }
-    const fromAccount = await this.accountRepository.findById(fromAccountId);
-    const toAccount = await this.accountRepository.findById(toAccountId);
+  async execute(
+    origin: string,
+    destination: string,
+    amount: number,
+  ): Promise<{
+    originBalance: number;
+    destinationBalance: number;
+  } | null> {
+    const originAccount = await this.accountRepository.findById(origin);
 
-    if (!fromAccount || !toAccount) {
-      throw new Error('Account not found');
-    }
-    if (fromAccount.balance < amount) {
-      throw new Error('Insufficient funds');
+    if (!originAccount) {
+      return null;
     }
 
-    fromAccount.balance -= amount;
-    toAccount.balance += amount;
+    if (originAccount.balance < amount) {
+      throw new Error('Saldo insuficiente');
+    }
 
-    await this.accountRepository.save(fromAccount);
-    await this.accountRepository.save(toAccount);
+    let destinationAccount = await this.accountRepository.findById(destination);
 
-    await this.transactionRepository.create({
-      accountId: fromAccountId,
-      type: TransactionType.TRANSFER,
-      amount,
-      destinationAccountId: toAccountId,
-    });
+    if (!destinationAccount) {
+      destinationAccount = new Account(destination, 0);
+    }
+
+    originAccount.balance -= amount;
+    destinationAccount.balance += amount;
+
+    await this.accountRepository.save(originAccount);
+    await this.accountRepository.save(destinationAccount);
+
+    return {
+      originBalance: originAccount.balance,
+      destinationBalance: destinationAccount.balance,
+    };
   }
 }

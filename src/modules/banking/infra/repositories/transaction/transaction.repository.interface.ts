@@ -1,4 +1,4 @@
-import { Transaction } from "~/modules/banking/domain/transaction.entity";
+import { Transaction } from "src/modules/banking/domain/transaction.entity";
 import { TransactionType } from "../../entities/transaction.orm.entity";
 
 
