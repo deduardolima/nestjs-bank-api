@@ -2,7 +2,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 
 import { Response } from 'express';
 import { DepositUseCase, ResetStateUseCase, TransferUseCase, WithdrawUseCase } from 'src/modules/banking/application/use-cases';
-import { Account } from 'src/modules/banking/domain/account.entity';
 import { BankingController } from 'src/modules/banking/infra/controllers/banking.controller';
 import { TransactionType } from 'src/modules/banking/infra/entities/transaction.orm.entity';
 import { AccountRepository } from 'src/modules/banking/infra/repositories/account/account.repository';
@@ -54,6 +53,18 @@ describe('BankingController', () => {
     accountRepository = module.get<AccountRepository>(AccountRepository);
   });
 
+  class Account {
+    constructor(public id: string, public balance: number) { }
+
+    deposit(amount: number) {
+      this.balance += amount;
+    }
+
+    withdraw(amount: number) {
+      this.balance -= amount;
+    }
+  }
+
   it('POST /reset - deve retornar 200 OK', async () => {
     const res = { status: jest.fn().mockReturnThis(), send: jest.fn() } as any as Response;
 
@@ -79,10 +90,8 @@ describe('BankingController', () => {
   it('POST /event (deposit) - Criar conta e retornar saldo', async () => {
     const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as any as Response;
 
-    jest.spyOn(depositUseCase, 'execute').mockResolvedValue({
-      id: '100',
-      balance: 10,
-    });
+    const mockAccount = new Account('100', 10);
+    jest.spyOn(depositUseCase, 'execute').mockResolvedValue(mockAccount);
 
     await bankingController.handleEvent(
       res,
@@ -103,10 +112,8 @@ describe('BankingController', () => {
   it('POST /event (deposit) - Depósito em uma conta existente', async () => {
     const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as any as Response;
 
-    jest.spyOn(depositUseCase, 'execute').mockResolvedValue({
-      id: '100',
-      balance: 20,
-    });
+    const mockAccount = new Account('100', 20);
+    jest.spyOn(depositUseCase, 'execute').mockResolvedValue(mockAccount);
 
     await bankingController.handleEvent(
       res,
