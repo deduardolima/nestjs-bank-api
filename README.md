@@ -41,26 +41,38 @@ Primeiro, clone o repositório do projeto:
 
 ```bash
 git clone https://github.com/deduardolima/nestjs-bank-api.git
-cd bank-api
+cd nestjs-bank-api
 
 ```
 #### Construindo e Subindo o Container
-Este projeto usa Docker para simplificar a execução. Para construir a imagem e subir o container, use:
+Este projeto usa Docker para simplificar a execução. Para construir a imagem e subir o container.
+
+Para subir o ambiente é necessário está na pasta raiz do projeto e executar os comandos abaixo:
+
+Instala as dependencias do projeto:
+```bash
+npm install
+```
+
+Este comando irá copiar as variáveis de ambiente necessárias para o projeto
 
 ```bash
-docker-compose up --build
-
+cp .env.example .env
 ```
-Este comando irá:
 
 - Construir a imagem Docker para o projeto.
 - Subir o container na porta 3000.
+
+```bash
+docker-compose up --build -d
+
+```
 
 #### Rodando Migrations
 Depois de subir o container, execute as migrações para preparar o banco de dados:
 
 ```bash
-docker-compose exec app npm run typeorm migration:run
+docker-compose exec nest-bank-api-backend npm run typeorm migration:run -- -d data-source.ts
 ```
 
 <h2 id="documentacao">📖 Documentação da API</h2> |
@@ -89,7 +101,7 @@ Para expor a API localmente utilizando Ngrok, siga os passos abaixo:
    Após instalar o Ngrok, inicie-o com o seguinte comando:
 
    ```bash
-   ngrok http 3000
+   ngrok http http://localhost:3000
    ```
 
 3.  Copie o link gerado pelo Ngrok e utilize-o para acessar a API de qualquer lugar.
